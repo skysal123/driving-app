@@ -1,0 +1,140 @@
+{% extends "admin/base.html" %}
+{% block title %}Renewals · DriveDesk Admin{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Subscription renewals</h1>
+    <p class="sub">Approve the UTR after the payment shows in your bank account. Approval unlocks the school immediately.</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('admin.school_new') }}">Add school</a>
+</div>
+
+<div class="grid">
+  <div class="stat"><b>{{ schools | length }}</b><span>Schools on the platform</span></div>
+  <div class="stat"><b>{{ active_count }}</b><span>Schools with active access</span></div>
+  <div class="stat"><b>Rs {{ "{:,}".format(mrr) }}</b><span>Monthly run rate</span></div>
+</div>
+
+<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
+    <div>
+      <h2>Pending renewals</h2>
+      <p class="sub">{{ renewals | length }} request{{ "" if renewals | length == 1 else "s" }} waiting for verification</p>
+    </div>
+    <span class="pill warn">{{ renewals | length }} pending</span>
+  </div>
+
+  {% if renewals %}
+  <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>School</th>
+          <th>UTR</th>
+          <th>Amount</th>
+          <th class="hide-sm">Submitted</th>
+          <th class="hide-sm">Current access ends</th>
+          <th class="right">Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for renewal in renewals %}
+        <tr>
+          <td>
+            <strong>{{ renewal.school.name }}</strong>
+            <div class="muted mono">#{{ renewal.school_id }} · {{ renewal.school.phone }}</div>
+          </td>
+          <td class="mono">{{ renewal.utr }}</td>
+          <td>Rs {{ renewal.amount }}</td>
+          <td class="hide-sm muted">{{ renewal.submitted_at.strftime("%d %b, %H:%M") }}</td>
+          <td class="hide-sm muted">{{ renewal.school.subscription_ends_at.strftime("%d %b %Y") }}</td>
+          <td class="right">
+            <div class="actions" style="justify-content:flex-end">
+              <form method="post" action="{{ url_for('admin.approve', renewal_id=renewal.id) }}">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <button class="btn-ok" type="submit">Approve</button>
+              </form>
+              <form method="post" action="{{ url_for('admin.reject', renewal_id=renewal.id) }}">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <input type="hidden" name="note" value="Payment not found">
+                <button class="btn-bad" type="submit">Reject</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">No renewal requests right now. New UTR submissions will appear here.</div>
+  {% endif %}
+  <p class="note">Approving extends access by 30 days from the later of today and the current end date. Check the UTR in your bank or UPI app before approving.</p>
+</div>
+
+<div class="card">
+  <h2>Schools</h2>
+  <p class="sub" style="margin-bottom:10px">Access status is based on the renewal date plus the {{ grace_hours }} hour grace window.</p>
+  <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>School</th>
+          <th>Owner</th>
+          <th>Plan</th>
+          <th>Access ends</th>
+          <th class="hide-sm">Days left</th>
+          <th class="hide-sm right">Students</th>
+          <th class="right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in schools %}
+        <tr>
+          <td>
+            <strong>{{ row.school.name }}</strong>
+            <div class="muted mono">#{{ row.school.id }} · {{ row.school.email }}</div>
+          </td>
+          <td>{{ row.owner.name if row.owner else "—" }}<div class="muted mono">{{ row.owner.phone if row.owner else "" }}</div></td>
+          <td>
+            <span class="pill {{ 'ok' if row.subscription.state in ('active', 'trialing') else ('warn' if row.subscription.state == 'grace' else 'bad') }}">
+              {{ row.subscription.state }}
+            </span>
+            <div class="muted">{{ row.subscription.plan }}</div>
+          </td>
+          <td>{{ row.school.subscription_ends_at.strftime("%d %b %Y") }}</td>
+          <td class="hide-sm">{{ row.subscription.daysLeft }}</td>
+          <td class="hide-sm right">{{ row.students }}</td>
+          <td class="right">
+            {% if row.owner %}
+            <a class="btn" href="{{ url_for('admin.owner_password', school_id=row.school.id) }}">Password</a>
+            {% else %}
+            <span class="muted">No owner</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if recent %}
+<div class="card">
+  <h2>Recent decisions</h2>
+  <table>
+    <thead><tr><th>School</th><th>UTR</th><th>Status</th><th class="hide-sm">Reviewed</th></tr></thead>
+    <tbody>
+      {% for renewal in recent %}
+      <tr>
+        <td>{{ renewal.school.name }}</td>
+        <td class="mono">{{ renewal.utr }}</td>
+        <td><span class="pill {{ 'ok' if renewal.status == 'approved' else 'bad' }}">{{ renewal.status }}</span></td>
+        <td class="hide-sm muted">{{ renewal.reviewed_at.strftime("%d %b, %H:%M") if renewal.reviewed_at else "—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

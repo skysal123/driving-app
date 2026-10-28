@@ -1,0 +1,24 @@
+{% extends "admin/base.html" %}
+{% block title %}Sign in · DriveDesk Admin{% endblock %}
+{% block content %}
+<div class="login-shell">
+  <div class="card">
+    <h1>Admin sign in</h1>
+    <p class="sub">Verify UPI renewals and manage school subscriptions.</p>
+    {% if error %}<div class="flash error" style="margin-top:14px">{{ error }}</div>{% endif %}
+    <form method="post" action="{{ url_for('admin.login_post') }}" style="margin-top:18px">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <div class="field">
+        <label for="email">Admin email</label>
+        <input id="email" name="email" type="email" autocomplete="username" required autofocus>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn btn-primary" type="submit" style="width:100%">Sign in</button>
+    </form>
+    <p class="note">Only super-admin accounts can use this portal.</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "admin/base.html" %}
+{% block title %}Add school · DriveDesk Admin{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Add a school</h1>
+    <p class="sub">Create the school, owner login and trial subscription in one step.</p>
+  </div>
+  <a class="btn" href="{{ url_for('admin.dashboard') }}">Cancel</a>
+</div>
+
+{% if errors %}
+<div class="flash error">
+  <strong>Fix these before continuing:</strong>
+  <ul style="margin:6px 0 0;padding-left:18px">
+    {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<div class="card" style="max-width:760px">
+  <form method="post" action="{{ url_for('admin.school_new') }}" novalidate>
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="name">School name</label>
+        <input id="name" name="name" type="text" maxlength="120" value="{{ values.get('name', '') }}" required autofocus>
+      </div>
+      <div class="field">
+        <label for="owner_name">Owner name</label>
+        <input id="owner_name" name="owner_name" type="text" maxlength="120" value="{{ values.get('owner_name', '') }}" required>
+      </div>
+      <div class="field">
+        <label for="email">Owner email</label>
+        <input id="email" name="email" type="email" maxlength="160" value="{{ values.get('email', '') }}" required>
+      </div>
+      <div class="field">
+        <label for="phone">Owner mobile</label>
+        <input id="phone" name="phone" type="text" inputmode="tel" maxlength="20" value="{{ values.get('phone', '') }}" placeholder="10-digit Indian number" required>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="address">School address (optional)</label>
+      <input id="address" name="address" type="text" maxlength="240" value="{{ values.get('address', '') }}">
+    </div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="trial_days">Trial length</label>
+        <select id="trial_days" name="trial_days">
+          {% for days in [7, 14, 30, 60, 90] %}
+          <option value="{{ days }}" {{ 'selected' if values.get('trial_days', '14')|string == days|string }}>{{ days }} days</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="password">Temporary owner password</label>
+        <input id="password" name="password" type="text" maxlength="128" value="{{ values.get('password', '') }}" autocomplete="off" required>
+      </div>
+    </div>
+    <p class="note" style="margin-top:-6px">Copy this password before submitting. The owner can sign in with their email or mobile number.</p>
+
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn btn-primary" type="submit">Create school</button>
+      <a class="btn" href="{{ url_for('admin.dashboard') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

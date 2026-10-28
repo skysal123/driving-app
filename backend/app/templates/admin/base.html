@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}DriveDesk Admin{% endblock %}</title>
+  <style>
+    :root{--ink:#0F172A;--muted:#64748B;--line:#E5EAF3;--brand:#0B5FFF;--navy:#08152E;--bg:#F4F7FC;--success:#0E9F6E;--danger:#D9454B;--warning:#B45309}
+    *{box-sizing:border-box}
+    body{margin:0;font:14px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+    a{color:var(--brand);text-decoration:none}
+    .wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+    header.top{background:var(--navy);color:#fff;padding:14px 0}
+    .top .wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:-.02em;font-size:16px;color:#fff}
+    .brand span.dot{width:26px;height:26px;border-radius:9px;background:var(--brand);display:grid;place-items:center;font-size:12px}
+    .top nav{display:flex;gap:16px;align-items:center;margin-left:auto;font-size:12.5px}
+    .top nav a,.top nav button{color:#C7D5F2;background:none;border:0;font:inherit;cursor:pointer;padding:0}
+    .top nav a:hover,.top nav button:hover{color:#fff}
+    main{padding:26px 0 60px}
+    .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+    h1{font-size:24px;letter-spacing:-.03em;margin:0}
+    h2{font-size:16px;letter-spacing:-.01em;margin:0 0 2px}
+    .sub{color:var(--muted);font-size:12.5px;margin:4px 0 0}
+    .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(15,23,42,.04);margin-bottom:18px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+    .stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+    .stat b{display:block;font-size:24px;letter-spacing:-.03em}
+    .stat span{color:var(--muted);font-size:11.5px}
+    table{width:100%;border-collapse:collapse}
+    th{text-align:left;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line)}
+    td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle;font-size:12.5px}
+    tr:last-child td{border-bottom:0}
+    .pill{display:inline-block;padding:3px 9px;border-radius:99px;font-size:10.5px;font-weight:700;background:#EEF2F9;color:#64748B;white-space:nowrap}
+    .pill.ok{background:#E7F7F1;color:var(--success)}
+    .pill.warn{background:#FFF6E6;color:var(--warning)}
+    .pill.bad{background:#FDECEC;color:var(--danger)}
+    .pill.info{background:#E8F0FF;color:var(--brand)}
+    .actions{display:flex;gap:6px}
+    button,.btn{border:0;border-radius:9px;padding:7px 12px;font:inherit;font-size:12px;font-weight:650;cursor:pointer;background:#EEF2F9;color:#334155}
+    .btn-primary{background:var(--brand);color:#fff}
+    .btn-ok{background:var(--success);color:#fff}
+    .btn-bad{background:#FDECEC;color:var(--danger)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    input[type=email],input[type=password],input[type=text],input[type=number],select{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font:inherit;outline:none;background:#fff}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+    .btn{display:inline-block;line-height:1.4;text-decoration:none}
+    input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(11,95,255,.12)}
+    label{display:block;font-size:11.5px;font-weight:700;margin:0 0 5px;color:#334155}
+    .field{margin-bottom:14px}
+    .login-shell{max-width:400px;margin:7vh auto 0}
+    .login-shell .card{padding:24px}
+    .login-shell h1{font-size:22px;margin-bottom:4px}
+    .flash{padding:10px 13px;border-radius:10px;margin-bottom:12px;font-size:12.5px}
+    .flash.success{background:#E7F7F1;color:#0B7A55}
+    .flash.error{background:#FDECEC;color:#B72F36}
+    .flash.info{background:#E8F0FF;color:#0B4CD6}
+    .empty{color:var(--muted);font-size:12.5px;padding:14px 0;text-align:center}
+    .mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11.5px}
+    .right{text-align:right}
+    .muted{color:var(--muted)}
+    .note{font-size:11.5px;color:var(--muted);margin-top:8px}
+    @media(max-width:760px){.grid,.form-grid{grid-template-columns:1fr}.hide-sm{display:none}table{font-size:12px}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="{{ url_for('admin.dashboard') }}"><span class="dot">DD</span> DriveDesk admin</a>
+      {% if admin %}
+      <nav>
+        <a href="{{ url_for('admin.school_new') }}">Add school</a>
+        <a href="{{ url_for('index') }}" target="_blank" rel="noopener">Open app</a>
+        <form method="post" action="{{ url_for('admin.logout') }}">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <button type="submit">Sign out</button>
+        </form>
+      </nav>
+      {% endif %}
+    </div>
+  </header>
+  <main class="wrap">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
