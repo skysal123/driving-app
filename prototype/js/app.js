@@ -132,6 +132,10 @@ function render() {
   view.innerHTML = `<div class="screen ${name}">${html}</div>`;
   if (!hideTabs) tabbar.innerHTML = renderTabbar(name);
   bindScreen(name, params);
+  if (window.I18N) {
+    I18N.apply(view);
+    I18N.apply(tabbar);
+  }
   window.scrollTo(0, 0);
 }
 
@@ -201,6 +205,7 @@ function renderLogin() {
         ? 'Sign in with your school account. <b>Explore demo school</b> opens sample data saved on this device.'
         : 'Demo login is prefilled. Any password with 4+ characters works, or tap <b>Explore demo school</b>.'}</p>
     </div>
+    <button class="link lang-link" type="button" id="lang-btn">${window.I18N && I18N.current() === 'mr' ? 'English' : 'मराठी'}</button>
     <p class="login-foot">New school? <button class="link" type="button" id="contact-link">Talk to us</button></p>
   </div>`;
 }
@@ -226,7 +231,9 @@ function bindLogin() {
       const submit = form.querySelector('button[type="submit"]');
       if (!id || p.length < 4) {
         if (err) {
-          err.textContent = !id ? 'Enter your mobile number or email.' : 'Password must be at least 4 characters.';
+          err.textContent = !id
+            ? (window.I18N ? I18N.t('Enter your mobile number or email.') : 'Enter your mobile number or email.')
+            : (window.I18N ? I18N.t('Password must be at least 4 characters.') : 'Password must be at least 4 characters.');
           err.hidden = false;
         }
         return;
@@ -240,7 +247,7 @@ function bindLogin() {
         go('/dashboard');
       } catch (error) {
         if (err) {
-          err.textContent = error.message || 'Could not sign in. Try again.';
+          err.textContent = window.I18N ? I18N.t(error.message || 'Could not sign in. Try again.') : (error.message || 'Could not sign in. Try again.');
           err.hidden = false;
         }
       } finally {
@@ -255,6 +262,16 @@ function bindLogin() {
       Store.demoLogin();
       go('/dashboard');
       setTimeout(() => UI.toast('Demo school loaded', 'success'), 140);
+    });
+  }
+
+  const langBtn = document.getElementById('lang-btn');
+  if (langBtn) {
+    langBtn.addEventListener('click', () => {
+      const next = window.I18N && I18N.current() === 'mr' ? 'en' : 'mr';
+      if (window.I18N) I18N.set(next);
+      render();
+      UI.toast(next === 'mr' ? 'भाषा: मराठी' : 'Language: English', 'success');
     });
   }
 
@@ -406,6 +423,7 @@ function bindDashboard() {
         return;
       }
       drop.innerHTML = dashboardSearch(q);
+      if (window.I18N) I18N.apply(drop);
       drop.hidden = false;
     });
     drop.addEventListener('click', (event) => {

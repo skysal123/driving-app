@@ -5,10 +5,11 @@ Driving-school management app for small Indian schools. Owners manage admissions
 ## Status
 
 - Prototype UI: complete (dashboard, admissions wizard, students, editable profiles, attendance with instructor attribution and multiple same-day sessions, classes, financial-period business reports with trainer/vehicle drill-downs, owner-managed instructors/vehicles, more/settings).
+- Languages: English and Marathi with runtime switching (login screen and More menu); the choice is stored per device and user data (names, course names) is never translated.
 - Backend: Flask API, SQLite for local development, PostgreSQL 16 for production.
 - Auth: JWT for the school app, Flask session + CSRF for the super-admin panel.
 - Subscription: ₹199/month after 14-day trial; 48h grace; manual 12-character UTR renewal; write endpoints return `402 subscription_expired`.
-- Tests: 52 pytest cases passing; smoke tests cover multiple classes in one submission, same-day session numbering, editable student profiles, attendance, reports and reload.
+- Tests: 52 pytest cases passing; smoke tests cover multiple classes in one submission, same-day session numbering, editable student profiles, attendance, reports, reload and the Marathi translation layer.
 
 ## Project layout
 

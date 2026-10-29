@@ -70,7 +70,7 @@
     if (!root) return;
     const el = document.createElement('div');
     el.className = 'toast toast-' + (type || 'info');
-    el.textContent = message;
+    el.textContent = window.I18N ? I18N.t(message) : message;
     root.appendChild(el);
     requestAnimationFrame(() => el.classList.add('show'));
     setTimeout(() => {
@@ -112,6 +112,7 @@
     overlay.className = 'overlay' + (opts.center ? ' center' : '');
     overlay.setAttribute('role', 'presentation');
     overlay.innerHTML = `<div class="sheet ${opts.center ? 'rounded' : ''}" role="dialog" aria-modal="true">${html}</div>`;
+    if (window.I18N) I18N.apply(overlay);
     root.appendChild(overlay);
     document.body.classList.add('no-scroll');
 

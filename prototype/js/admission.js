@@ -548,7 +548,7 @@ async function submitAdmission() {
   const submit = document.getElementById('adm-submit');
   if (submit) {
     submit.disabled = true;
-    submit.textContent = 'Saving admission...';
+    submit.textContent = window.I18N ? I18N.t('Saving admission...') : 'Saving admission...';
   }
   try {
     const student = await Store.addStudent(a);
@@ -560,7 +560,7 @@ async function submitAdmission() {
     UI.toast(error.message || 'Could not save the admission', 'danger');
     if (submit) {
       submit.disabled = false;
-      submit.innerHTML = icon('check') + ' Complete admission';
+      submit.innerHTML = icon('check') + (window.I18N ? ' ' + I18N.t('Complete admission') : ' Complete admission');
     }
   }
 }

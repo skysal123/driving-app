@@ -79,7 +79,7 @@ function applyStudentFilter() {
   });
 
   const count = document.getElementById('stu-count');
-  if (count) count.textContent = `${visible} student${visible === 1 ? '' : 's'}`;
+  if (count) count.textContent = window.I18N ? I18N.t(`${visible} student${visible === 1 ? '' : 's'}`) : `${visible} student${visible === 1 ? '' : 's'}`;
   const empty = document.getElementById('stu-empty');
   if (empty) empty.hidden = visible > 0;
 }
@@ -513,7 +513,7 @@ function openEditStudent(studentId) {
 
       if (photo) patch.photo = photo;
       saveBtn.disabled = true;
-      saveBtn.textContent = 'Saving...';
+      saveBtn.textContent = window.I18N ? I18N.t('Saving...') : 'Saving...';
       try {
         await Store.updateStudent(s.id, patch);
         UI.closeModal();
@@ -522,7 +522,7 @@ function openEditStudent(studentId) {
       } catch (err) {
         UI.toast(err.message || 'Could not update student', 'danger');
         saveBtn.disabled = false;
-        saveBtn.innerHTML = icon('check') + ' Save changes';
+        saveBtn.innerHTML = icon('check') + (window.I18N ? ' ' + I18N.t('Save changes') : ' Save changes');
       }
     });
   }
@@ -608,7 +608,7 @@ function openPayment(s) {
       return;
     }
     save.disabled = true;
-    save.textContent = 'Saving...';
+    save.textContent = window.I18N ? I18N.t('Saving...') : 'Saving...';
     try {
       await Store.addPayment(s.id, {
         amount: value,
@@ -621,7 +621,7 @@ function openPayment(s) {
     } catch (error) {
       UI.toast(error.message || 'Could not record the payment', 'danger');
       save.disabled = false;
-      save.innerHTML = icon('receipt') + ' Record payment';
+      save.innerHTML = icon('receipt') + (window.I18N ? ' ' + I18N.t('Record payment') : ' Record payment');
     }
   });
 }
@@ -780,13 +780,15 @@ function openAttendance(studentId) {
       button.setAttribute('aria-pressed', String(on));
     });
     if (countHint) {
-      if (remaining < 1) countHint.textContent = 'No classes are remaining in this course.';
-      else if (!valid) countHint.textContent = `Enter a whole number from 1 to ${remaining}.`;
-      else if (count === 1) countHint.textContent = `Will mark Session ${nextSessionNo} today.`;
-      else countHint.textContent = `Will mark ${count} classes: Session ${nextSessionNo} to Session ${nextSessionNo + count - 1}.`;
+      if (remaining < 1) countHint.textContent = window.I18N ? I18N.t('No classes are remaining in this course.') : 'No classes are remaining in this course.';
+      else if (!valid) countHint.textContent = window.I18N ? I18N.t(`Enter a whole number from 1 to ${remaining}.`) : `Enter a whole number from 1 to ${remaining}.`;
+      else if (count === 1) countHint.textContent = window.I18N ? I18N.t(`Will mark Session ${nextSessionNo} today.`) : `Will mark Session ${nextSessionNo} today.`;
+      else countHint.textContent = window.I18N ? I18N.t(`Will mark ${count} classes: Session ${nextSessionNo} to Session ${nextSessionNo + count - 1}.`) : `Will mark ${count} classes: Session ${nextSessionNo} to Session ${nextSessionNo + count - 1}.`;
     }
     if (saveBtn) {
-      saveBtn.innerHTML = icon('check') + (valid && count > 1 ? ` Mark ${count} classes` : ' Mark present');
+      saveBtn.innerHTML = icon('check') + (window.I18N
+        ? ' ' + I18N.t(valid && count > 1 ? `Mark ${count} classes` : 'Mark present')
+        : (valid && count > 1 ? ` Mark ${count} classes` : ' Mark present'));
     }
   };
 
@@ -840,7 +842,7 @@ function openAttendance(studentId) {
       return;
     }
     saveBtn.disabled = true;
-    saveBtn.textContent = 'Saving...';
+    saveBtn.textContent = window.I18N ? I18N.t('Saving...') : 'Saving...';
     try {
       await Store.markAttendance(s.id, {
         signature: pad.dataURL(),

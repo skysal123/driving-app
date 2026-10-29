@@ -45,6 +45,10 @@
   });
 
   viewEl.innerHTML = '<div class="empty" style="padding-top:80px"><b>Loading DriveDesk…</b><p>Connecting to your school.</p></div>';
+  if (window.I18N) {
+    I18N.apply(viewEl);
+    I18N.apply(tabbarEl);
+  }
 
   Store.init()
     .then(() => render())

@@ -768,6 +768,7 @@ function renderMore() {
     <section class="section">
       <p class="section-label">App</p>
       <div class="card list">
+        ${menuItem({ ic: 'globe', label: 'Language', sub: window.I18N ? I18N.label() : 'English', action: 'language' })}
         ${menuItem({ ic: 'bell', label: 'Notifications', sub: 'Class reminders for students', action: 'notifications' })}
         ${menuItem({ ic: 'shield', label: 'Privacy & data', sub: 'Consent, exports and deletion', action: 'privacy' })}
         ${menuItem({ ic: 'message', label: 'Help & support', sub: 'hello@drivedesk.in', action: 'support' })}
@@ -838,6 +839,7 @@ function openCoursesModal() {
         <button class="btn btn-ghost" type="button" data-close>Cancel</button>
         <button class="btn btn-primary" type="button" id="courses-save">Save changes</button>
       </div>`;
+    if (window.I18N) I18N.apply(body);
   };
 
   const validate = () => {
@@ -906,7 +908,7 @@ function openCoursesModal() {
     } catch (error) {
       UI.toast(error.message || 'Could not save changes', 'danger');
       save.disabled = false;
-      save.textContent = 'Save changes';
+      save.textContent = window.I18N ? I18N.t('Save changes') : 'Save changes';
     }
   });
 
@@ -958,6 +960,7 @@ function openFleetModal() {
         <button class="btn btn-ghost" type="button" data-close>Cancel</button>
         <button class="btn btn-primary" type="button" id="fleet-save">Save changes</button>
       </div>`;
+    if (window.I18N) I18N.apply(body);
   };
 
   const listFor = (kind) => (kind === 'instructors' ? instructors : vehicles);
@@ -1010,7 +1013,7 @@ function openFleetModal() {
     } catch (error) {
       UI.toast(error.message || 'Could not save changes', 'danger');
       save.disabled = false;
-      save.textContent = 'Save changes';
+      save.textContent = window.I18N ? I18N.t('Save changes') : 'Save changes';
     }
   });
 
@@ -1083,11 +1086,11 @@ function bindMore() {
                 <div class="time-col"><b>${fmtDateShort(row.submittedAt)}</b><span>${esc(row.utr)}</span></div>
                 <div class="row-main">
                   <p class="row-title">${money(row.amount)}</p>
-                  <p class="row-sub">${esc(row.status)}${row.note ? ' ? ' + esc(row.note) : ''}</p>
-                </div>
+                  <p class="row-sub">${esc(row.status)}${row.note ? ' ? ' + esc(row.note) : ''}</p></div>
                 <span class="chip ${row.status === 'approved' ? 'chip-success' : (row.status === 'rejected' ? 'chip-danger' : 'chip-warning')}">${esc(row.status)}</span>
               </div>`).join('')}
           </div>`;
+        if (window.I18N) I18N.apply(history);
       }).catch(() => {});
 
       const submit = overlay.querySelector('#renew-submit');
@@ -1099,7 +1102,7 @@ function bindMore() {
           return;
         }
         submit.disabled = true;
-        submit.textContent = 'Submitting...';
+        submit.textContent = window.I18N ? I18N.t('Submitting...') : 'Submitting...';
         try {
           await Store.submitRenewal(utr, ((overlay.querySelector('#renew-note') || {}).value || ''));
           UI.closeOverlay(overlay);
@@ -1108,12 +1111,18 @@ function bindMore() {
         } catch (error) {
           UI.toast(error.message || 'Could not submit the renewal', 'danger');
           submit.disabled = false;
-          submit.innerHTML = icon('refresh') + ' Submit for verification';
+          submit.innerHTML = icon('refresh') + (window.I18N ? ' ' + I18N.t('Submit for verification') : ' Submit for verification');
         }
       });
     },
     fleet: () => openFleetModal(),
     courses: () => openCoursesModal(),
+    language: () => {
+      const next = window.I18N && I18N.current() === 'mr' ? 'en' : 'mr';
+      if (window.I18N) I18N.set(next);
+      render();
+      UI.toast(next === 'mr' ? 'भाषा: मराठी' : 'Language: English', 'success');
+    },
     notifications: () => UI.toast('Reminder settings — next', 'info'),
     privacy: () => UI.toast('Privacy controls — next', 'info'),
     support: () => UI.toast('Support: hello@drivedesk.in', 'info'),
